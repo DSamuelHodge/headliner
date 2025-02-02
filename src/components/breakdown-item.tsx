@@ -18,14 +18,12 @@ interface Metadata {
 
 interface BreakdownItemProps {
   point: string;
-  index: number;
   additionalInfo?: string;
   metadata?: Metadata;
 }
 
 export function BreakdownItem({ 
   point, 
-  index, 
   additionalInfo = "More detailed information about this point goes here...",
   metadata = {
     dateUpdated: new Date().toLocaleDateString(),

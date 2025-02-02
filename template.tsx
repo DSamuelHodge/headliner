@@ -2,9 +2,21 @@ import React, { useState, createContext, useContext } from 'react';
 import { ArrowRight, ChevronRight, Copy, Check, Twitter, Linkedin, ExternalLink, Moon, Sun } from 'lucide-react';
 
 // Theme Context
-const ThemeContext = createContext();
+interface ThemeContextType {
+  isDark: boolean;
+  toggleTheme: () => void;
+}
 
-const ThemeProvider = ({ children }) => {
+const ThemeContext = createContext<ThemeContextType>({
+  isDark: false,
+  toggleTheme: () => {},
+});
+
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+
+const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [isDark, setIsDark] = useState(false);
   
   const toggleTheme = () => setIsDark(!isDark);
@@ -38,6 +50,22 @@ const ThemeToggle = () => {
   );
 };
 
+interface BreakdownItemProps {
+  point: string;
+  index: number;
+  additionalInfo?: string;
+  metadata?: {
+    dateUpdated: string;
+    source: string;
+    confidence: string;
+    category: string;
+    relatedLinks: Array<{
+      title: string;
+      url: string;
+    }>;
+  };
+}
+
 const BreakdownItem = ({ 
   point, 
   index, 
@@ -52,12 +80,12 @@ const BreakdownItem = ({
       { title: "Industry Report", url: "#" }
     ]
   }
-}) => {
+}: BreakdownItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
 
-  const copyToClipboard = (e, text) => {
+  const copyToClipboard = (e: React.MouseEvent, text: string) => {
     e.stopPropagation();
     navigator.clipboard.writeText(text);
     setIsCopied(true);
@@ -128,10 +156,15 @@ const BreakdownItem = ({
 
               {activeTab === 'metadata' && (
                 <div className="space-y-2 text-sm">
-                  {Object.entries(metadata).slice(0, 4).map(([key, value]) => (
+                  {Object.entries(metadata).map(([key, value]) => (
                     <div key={key} className="flex justify-between items-center py-1 border-b border-gray-200 dark:border-gray-700">
                       <span className="text-gray-500 dark:text-gray-400">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                      <span className="text-gray-700 dark:text-gray-300">{value}</span>
+                      <span className="text-gray-700 dark:text-gray-300">
+                        {key === 'relatedLinks' 
+                          ? (value as Array<{title: string; url: string}>).length + ' links'
+                          : String(value)
+                        }
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -159,15 +192,34 @@ const BreakdownItem = ({
   );
 };
 
+interface NewsBriefTemplateProps {
+  number: string;
+  title: string;
+  brief: string;
+  breakdown: string[];
+  importance: {
+    text: string;
+    sources: string[];
+  };
+  author: {
+    name: string;
+    image: string;
+    role: string;
+  };
+  publishDate: string;
+  publishTime: string;
+}
+
 const NewsBriefTemplate = ({ 
   number, 
   title, 
   brief, 
-  breakdown, 
+  breakdown,
   importance,
-  author = { name: "Default Author", image: "/api/placeholder/48/48", role: "Tech Analyst" },
-  publishDate = new Date().toLocaleDateString()
-}) => {
+  author,
+  publishDate,
+  publishTime
+}: NewsBriefTemplateProps) => {
   return (
     <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm transition-colors duration-200">
       {/* Header with Theme Toggle */}
@@ -231,7 +283,7 @@ const NewsBriefTemplate = ({
             </div>
             <div>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                {importance}
+                {importance.text}
               </p>
               {importance.sources && (
                 <div className="mt-4 flex gap-2 flex-wrap">
@@ -285,13 +337,17 @@ const ExampleBrief = () => {
       "Investment represents ~70% increase from previous year",
       "Follows industry trend of massive AI infrastructure investments"
     ],
-    importance: "The AI infrastructure race continues to accelerate as major players invest heavily in computing resources, highlighting the critical role of scale in AI development.",
+    importance: {
+      text: "The AI infrastructure race continues to accelerate as major players invest heavily in computing resources, highlighting the critical role of scale in AI development.",
+      sources: []
+    },
     author: {
       name: "Lewis Walker",
       image: "/api/placeholder/48/48",
       role: "AI Industry Analyst"
     },
-    publishDate: "February 1, 2025"
+    publishDate: "February 1, 2025",
+    publishTime: ""
   };
 
   return (

@@ -1,6 +1,5 @@
 'use client';
 
-import Image from "next/image";
 import { ExternalLink, Twitter, Linkedin, Share2 } from 'lucide-react';
 import { BreakdownItem } from "@/components/breakdown-item";
 
@@ -132,7 +131,7 @@ export default function Home() {
           {/* Why It's Important Section */}
           <div className="mb-12">
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">
-              Why It's Important
+              Why It&apos;s Important
             </h3>
             <div className="backdrop-blur-sm bg-white/50 dark:bg-gray-900/50 rounded-lg p-6">
               <div className="flex gap-4">
